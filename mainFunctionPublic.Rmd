@@ -1,0 +1,64 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+#Load Libraries
+library(tidyverse)
+library(ggplot2)
+library(viridis)
+library(lans2r)
+library(readr)
+library(mosaic)
+library(colocr)
+library(imager)
+library(mblm)
+```
+
+```{r}
+#Set a seed
+set.seed(5105913)
+
+# File paths (as string) for the folder where you want to save the graphs ("fileDestinationPath"), and the folder in which the original data is located ("dataPath")
+fileDestinationPath = ""
+dataPath = ""
+
+# File paths (as strings) to each of the following r scripts
+filterDataPath = ""
+getThresholdPath = ""
+graphPlotsPath = ""
+getCoefficientsPath = ""
+
+# Sourcing the .R files
+
+source(filterDataPath)
+source(getThresholdPath)
+source(graphPlotsPath)
+source(getCoefficientsPath)
+```
+
+```{r}
+# Sets the names of the isotopes to be compared. Choose any two within the sample data ("12C-12C", "12C14N-12C", "12C15N-12C14N", "32S-12C")
+iso1 = "12C2-12C"
+iso2 = "12C14N-12C"
+
+# Returns the dataset for the desired isotope pair by analysis. This function returns the MatLab file in a useable form for R for only the selected isotope pair by analysis.
+DATA <- filterData(dataPath, iso1, iso2)
+
+
+# Returns the thresholds for isotope 1 and 2. The first element returned corresponds to isotope 1 threshold, second element returned corresponds to isotope 2 threshold, third element returned is the scatterplot with the regression line and thresholds
+THRESH <- getThreshold(DATA, iso1, iso2, fileDestinationPath)
+
+# Plot the scatterplot returned
+THRESH[[3]]
+
+# The plots are saved as pdfs to the folder path specified in "fileDestinationPath", which is the 6th argument of the graphPlots function
+graphPlots(DATA, iso1, iso2, THRESH[[1]], THRESH[[2]], fileDestinationPath)
+
+
+# Returns 5 correlation coefficients: MOC, M1, M2, Pearson, and Spearman
+coefficients <- getCoefficients(DATA, iso1, iso2, THRESH[[1]], THRESH[[2]], final_color)
+coefficients
+```
+
